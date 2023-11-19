@@ -40,7 +40,10 @@ public class PlayerWindow extends JFrame {
     public void addLetter(char letter) {
         wordTextArea.append(String.valueOf(letter));
     }
-
+    public void resetWordArea() {
+        wordTextArea.setText("");
+    }
+    
     public String proposeWord() {
         return wordTextArea.getText().toUpperCase();
     }

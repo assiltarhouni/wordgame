@@ -43,16 +43,16 @@ public class WordGame {
     }
 
     private void initializeUI() {
-        ActionListener buttonClickListener = e -> handleButtonClick(e);
-
         player1Window = new PlayerWindow("Player 1");
         player2Window = new PlayerWindow("Player 2");
         List<Character> letters = generateRandomLetters();  // Generate random letters
-        gameWindow = new GameWindow("Game", letters);
-
-
+        gameWindow = new GameWindow("Game", letters, e -> handleButtonClick(e));
+    
         player1Window.addSubmitListener(e -> handlePlayerSubmit(player1Window));
         player2Window.addSubmitListener(e -> handlePlayerSubmit(player2Window));
+    
+        // Set the button click listener after creating player windows
+        gameWindow.setButtonClickListener(e -> handleButtonClick(e));
     }
 
     private List<Character> generateRandomLetters() {
@@ -92,29 +92,36 @@ public class WordGame {
     private void handlePlayerSubmit(PlayerWindow playerWindow) {
         String playerName = playerWindow.getPlayerName();
         String word = playerWindow.proposeWord();
-
-        if (isValidWord(word)) {
-            if (currentPlayerIndex == 0) {
-                wordsCorrectPlayer1++;
+    
+        if (!playerName.isEmpty() && !word.isEmpty()) {
+            if (isValidWord(word)) {
+                if (currentPlayerIndex == 0) {
+                    wordsCorrectPlayer1++;
+                } else {
+                    wordsCorrectPlayer2++;
+                }
+                JOptionPane.showMessageDialog(null, "Correct word!");
             } else {
-                wordsCorrectPlayer2++;
+                JOptionPane.showMessageDialog(null, "Incorrect word!");
             }
-            JOptionPane.showMessageDialog(null, "Correct word!");
         } else {
-            JOptionPane.showMessageDialog(null, "Incorrect word!");
+            JOptionPane.showMessageDialog(null, "Please enter both name and word!");
+            return; // Exit the method if either name or word is empty
         }
-
+    
         // Handle end of round or game
         if (currentPlayerIndex == 0) {
             currentPlayerIndex = 1;
             player2Window.setVisible(true);
             player1Window.setVisible(false);
+            player2Window.resetWordArea();
         } else {
             currentPlayerIndex = 0;
             player1Window.setVisible(true);
             player2Window.setVisible(false);
+            player1Window.resetWordArea();
         }
-
+    
         if (wordsCorrectPlayer1 + wordsCorrectPlayer2 < MAX_WORDS_PER_PLAYER * 2) {
             // Start a new round
             startRound();
@@ -122,6 +129,7 @@ public class WordGame {
             endGame();
         }
     }
+    
 
     private boolean isValidWord(String word) {
         return dictionary.contains(word);
