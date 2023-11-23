@@ -14,6 +14,7 @@ public class WordGame {
     private static final int TIMER_DURATION = 240000; // 4 minutes
     private static final int MAX_WORDS_PER_PLAYER = 3;
     private Timer timer;
+    private static final int NUM_ROUNDS = 3;
 
     private PlayerWindow player1Window;
     private PlayerWindow player2Window;
@@ -96,6 +97,8 @@ public class WordGame {
         wordsCorrectPlayer1 = 0;
         wordsCorrectPlayer2 = 0;
         timer = new Timer();
+
+        startRound();
     }
 
     private void handleButtonClick(ActionEvent e) {
@@ -136,15 +139,51 @@ public class WordGame {
             player1Window.setVisible(true);
             player2Window.setVisible(false);
             player1Window.resetWordArea();
+
+            // Compare words after each round
+            compareWords();
         }
-    
-        if (wordsCorrectPlayer1 + wordsCorrectPlayer2 < MAX_WORDS_PER_PLAYER * 2) {
+
+        if (wordsCorrectPlayer1 + wordsCorrectPlayer2 < MAX_WORDS_PER_PLAYER * NUM_ROUNDS) {
             // Start a new round
             startRound();
         } else {
             endGame();
         }
     }
+    private void compareWords() {
+        String wordPlayer1 = player1Window.proposeWord();
+        String wordPlayer2 = player2Window.proposeWord();
+    
+        boolean isValidWordPlayer1 = isValidWord(wordPlayer1);
+        boolean isValidWordPlayer2 = isValidWord(wordPlayer2);
+    
+        if (isValidWordPlayer1 && isValidWordPlayer2) {
+            // Both players have correct words
+            int lengthPlayer1 = wordPlayer1.length();
+            int lengthPlayer2 = wordPlayer2.length();
+    
+            if (lengthPlayer1 > lengthPlayer2) {
+                JOptionPane.showMessageDialog(null, player1Window.getPlayerName() + " wins this round!");
+            } else if (lengthPlayer1 < lengthPlayer2) {
+                JOptionPane.showMessageDialog(null, player2Window.getPlayerName() + " wins this round!");
+            } else {
+                // If lengths are equal, it's a tie
+                JOptionPane.showMessageDialog(null, "It's a tie for this round!");
+            }
+        } else if (isValidWordPlayer1) {
+            // Player 1 has a correct word, Player 2 has an incorrect word
+            JOptionPane.showMessageDialog(null, player1Window.getPlayerName() + " wins this round!");
+        } else if (isValidWordPlayer2) {
+            // Player 2 has a correct word, Player 1 has an incorrect word
+            JOptionPane.showMessageDialog(null, player2Window.getPlayerName() + " wins this round!");
+        } else {
+            // Both players have incorrect words
+            JOptionPane.showMessageDialog(null, "It's a tie for this round!");
+        }
+    }
+    
+    
     
 
     private boolean isValidWord(String word) {
