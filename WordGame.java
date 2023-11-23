@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;  // Import Timer from java.util
@@ -57,23 +58,38 @@ public class WordGame {
 
     private List<Character> generateRandomLetters() {
         List<Character> letters = new ArrayList<>();
+        List<Character> vowels = Arrays.asList('A', 'E', 'I', 'O', 'U');
+        List<Character> consonants = Arrays.asList('B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z');
+    
+        // Add random vowels (up to 3 times each)
         for (int i = 0; i < 3; i++) {
-            // Add vowels 3 times
-            letters.add('A');
-            letters.add('E');
-            letters.add('I');
-            letters.add('O');
-            letters.add('U');
+            Collections.shuffle(vowels);
+            letters.add(vowels.get(0));
         }
+    
+        // Add random consonants (up to 2 times each)
         for (int i = 0; i < 2; i++) {
-            // Add consonants 2 times
-            letters.add('B');
-            letters.add('C');
-            // Add other consonants as needed
+            Collections.shuffle(consonants);
+            letters.add(consonants.get(0));
         }
+    
+        // Fill the remaining slots with random vowels and consonants
+        while (letters.size() < 12) {
+            if (Math.random() < 0.5 && vowels.size() > 0) {
+                Collections.shuffle(vowels);
+                letters.add(vowels.get(0));
+            } else if (consonants.size() > 0) {
+                Collections.shuffle(consonants);
+                letters.add(consonants.get(0));
+            }
+        }
+    
+        // Shuffle the combined list
         Collections.shuffle(letters);
         return letters;
     }
+    
+
 
     private void initializeGame() {
         currentPlayerIndex = 0;
