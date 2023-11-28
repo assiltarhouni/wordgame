@@ -14,7 +14,10 @@ public class WordGame {
     private static final int TIMER_DURATION = 240000; // 4 minutes
     private static final int MAX_WORDS_PER_PLAYER = 3;
     private Timer timer;
-    private static final int NUM_ROUNDS = 3;
+    private static final int NUM_ROUNDS = 2;
+    private int roundsPlayed;
+    private String longestWord;
+    private String playerWithLongestWord;
 
     private PlayerWindow player1Window;
     private PlayerWindow player2Window;
@@ -30,6 +33,7 @@ public class WordGame {
         initializeDictionary();
         initializeUI();
         initializeGame();
+        
     }
 
     private void initializeDictionary() {
@@ -97,7 +101,9 @@ public class WordGame {
         wordsCorrectPlayer1 = 0;
         wordsCorrectPlayer2 = 0;
         timer = new Timer();
-
+        roundsPlayed = 0;
+        longestWord = "";
+        playerWithLongestWord = "";
         startRound();
     }
 
@@ -144,9 +150,10 @@ public class WordGame {
             compareWords();
         }
 
-        if (wordsCorrectPlayer1 + wordsCorrectPlayer2 < MAX_WORDS_PER_PLAYER * NUM_ROUNDS) {
+        if (roundsPlayed <= NUM_ROUNDS) {
             // Start a new round
             startRound();
+            roundsPlayed++;
         } else {
             endGame();
         }
@@ -181,6 +188,15 @@ public class WordGame {
             // Both players have incorrect words
             JOptionPane.showMessageDialog(null, "It's a tie for this round!");
         }
+        if (wordPlayer1.length() > longestWord.length()) {
+            longestWord = wordPlayer1;
+            playerWithLongestWord = player1Window.getPlayerName();
+        }
+
+        if (wordPlayer2.length() > longestWord.length()) {
+            longestWord = wordPlayer2;
+            playerWithLongestWord = player2Window.getPlayerName();
+        }
     }
     
     
@@ -191,6 +207,7 @@ public class WordGame {
     }
 
     private void startRound() {
+         // Increment roundsPlayed when starting a new round
         startTime = System.currentTimeMillis();
         gameWindow.enableAllLetterButtons();
         timer.schedule(new TimerTask() {
@@ -203,7 +220,15 @@ public class WordGame {
         }, TIMER_DURATION);
         gameWindow.setVisible(true);
     }
+    private void displayRoundStatistics() {
+        // Show statistics like the player with the most correct words and the longest word
+        String roundStatistics = String.format("\nRound Statistics:\n%s: %d correct words\n%s: %d correct words\nLongest Word: %s by %s",
+                player1Window.getPlayerName(), wordsCorrectPlayer1,
+                player2Window.getPlayerName(), wordsCorrectPlayer2,
+                longestWord, playerWithLongestWord);
 
+        JOptionPane.showMessageDialog(null, roundStatistics);
+    }
     private void endGame() {
         timer.cancel(); // Cancel the timer
 
@@ -218,7 +243,9 @@ public class WordGame {
                 minutes, seconds);
 
         JOptionPane.showMessageDialog(null, resultMessage);
-
+        if (roundsPlayed > NUM_ROUNDS) {
+            displayRoundStatistics();
+        }
         // Add more statistics as needed
         System.exit(0);
     }
